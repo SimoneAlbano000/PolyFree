@@ -93,13 +93,6 @@ class PolyFree(toga.App):
         data_box.add(rooms_available_from_now)
 
         main_box.add(data_box)
-
-        # Add table (Bright_beta)
-        headings_test = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì']
-        data_test = []
-        table_test = toga.Table(headings_test, data=data_test, missing_value='Data unavailable', style=Pack(font_size=text_size))  
-        main_box.add(table_test)   
-
         main_box.add(dev_box)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
