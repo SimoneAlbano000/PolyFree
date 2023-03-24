@@ -24,6 +24,7 @@ test_sources = [
 requires = [
     "requests",
     "bs4",
+    "base64",
 ]
 test_requires = [
     "pytest",
@@ -128,6 +129,7 @@ requires = [
     "toga-android~=0.3.0",
     "requests",
     "bs4",
+    "base64",
 ]
 
 # Web deployments

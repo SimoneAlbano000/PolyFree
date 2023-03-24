@@ -3,6 +3,7 @@ Free rooms in Polito
 """
 import re
 import requests
+import base64
 from bs4 import BeautifulSoup
 
 import toga
@@ -62,12 +63,14 @@ def SubtractRooms(dataSet: tuple):
     return resRoomList
 
 def getRev():
-    rev_url = 'https://raw.githubusercontent.com/SimoneAlbano000/PolyFree/main/app.rev'
-    try:
-        page = requests.get(rev_url)
-        app_rev = page.text
-    except:
+    rev_url = 'https://api.github.com/repos/SimoneAlbano000/PolyFree/contents/app.rev'
+    req = requests.get(rev_url)
+    if(req.status_code == requests.codes.ok):
+        req = req.json()
+        app_rev = base64.b64decode(req['content'])
+    else:
         app_rev = "Not Found"
+    print(app_rev)
     return str(app_rev)
 
 class PolyFree(toga.App):
