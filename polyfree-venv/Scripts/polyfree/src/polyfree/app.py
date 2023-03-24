@@ -16,7 +16,8 @@ def getRooms():
             page = requests.get('https://www.swas.polito.it/dotnet/orari_lezione_pub/RicercaAuleLiberePerFasceOrarie.aspx')
             break
         except:
-          pass  
+          pass
+    ## ---------------------------------------------------------------------------
     soup = BeautifulSoup(page.text, 'html.parser')
     roomsTable = soup.find(class_='ListElement')
     roomsTime = roomsTable.find_all('span', id=re.compile("Pagina_gv_AuleLibere_lbl_FasciaOraria_"))
@@ -24,73 +25,78 @@ def getRooms():
     # Extract only the required data
     timesList = []
     for time in roomsTime:
-        timesList.append(time.contents[0])
+        timesList.append(str(time.contents).lstrip("['").rstrip("']").split(','))
+    # ---------------------------------------------------------------------------
     roomsList = []
     for room in roomsFree:
-        roomsList.append(room.contents[0])
-    # Return a tuple
-    return (timesList, roomsList, len(timesList))
+        # Check for empty spans
+        if(len(room.contents)==0):
+            room.contents = ["Empty"]
+        roomsList.append(str(room.contents).lstrip("['").rstrip("']").split(','))
+    # ---------------------------------------------------------------------------
+    return (timesList, roomsList)
 
-def getRoomsNextAvailable(data):
-    # Subtract the 'i' free rooms from the 'i+1' rooms list
-    # Trasform list into vector of rooms
-    str2list = []
-    list2str = []
-    list2str.append('Empty')
-    # Convert string to list
-    for rooms in data[1]:
-        str2list.append(rooms.split(','))
-    # Make subtration
-    for i in range(0, data[2]-1, 1):
-        set1 = set(str2list[i])
-        set2 = set(str2list[i+1])
-        for j in set1:
-            set2.discard(j)
-        # Check for empty sets
+def SubtractRooms(dataSet: tuple):
+    resRoomList = []
+    resRoomList.append(["Empty"])
+    for element in range(0, len(dataSet)-1, 1):
+        # Check for "Empty" lists
+        # -------------------------------
+        if(dataSet[element][0]=="Empty"):
+            set1 = set()
+        else:
+            set1 = set(dataSet[element])
+        # -------------------------------
+        if(dataSet[element+1][0]=="Empty"):
+            set2 = set()
+        else:
+            set2 = set(dataSet[element+1])
+        # -------------------------------
+        # Subtract the sets
+        for room in set1:
+            set2.discard(room)
+        # Check again for "Empty" sets
         if(len(set2)==0):
-            set2.add('Empty')
-        list2str.append(','.join(list(set2)))
-    return list2str
+            set2.add(["Empty"])
+        resRoomList.append(list(set2))
+    return resRoomList
 
 class PolyFree(toga.App):
-
     def startup(self):
+        # Create the main container for all the pages
         main_box = toga.Box(style=Pack(direction=COLUMN))
         data_box = toga.Box(style=Pack(direction=COLUMN))
         dev_box = toga.Box(style=Pack(direction=COLUMN))
-        text_size = 18
-        rev = '1.0.7'
-        # Create the main container for all the pages
-        # __removed__ container = toga.OptionContainer()
-        
+        text_size = 10
+        rev = '1.0.9'
+
         headings = ['Times:', 'Rooms:']
         data = []
         # Add our data(Free now) to a Table, ready to be returned
         rooms_table_free_now = toga.Table(headings, data=data, missing_value='Data unavailable', style=Pack(font_size=text_size))
         # Add our data(Available from now) to a Table, ready to be returned
-        rooms_available_from_now = toga.Table(headings, data=data, missing_value='Data unavailable', style=Pack(font_size=text_size))
+        rooms_table_lecture_ended_now = toga.Table(headings, data=data, missing_value='Data unavailable', style=Pack(font_size=text_size))
 
         # Obtain the rooms data
-        roomsData_freeNow = getRooms()
-        roomsData_available_from_now = getRoomsNextAvailable(roomsData_freeNow)
+        tupleOfData = getRooms()
+        roomsAvailableNow = tupleOfData[1]
+        roomsLectureEndedNow = SubtractRooms(tupleOfData[1])
 
-        for i in range(0, roomsData_freeNow[2], 1):
+        for i in range(0, len(tupleOfData[0]), 1):
             # Compose all the data into the tables
-            rooms_table_free_now.data.append(str(roomsData_freeNow[0][i]), str(roomsData_freeNow[1][i]))
-            rooms_available_from_now.data.append(str(roomsData_freeNow[0][i]), str(roomsData_available_from_now[i]))
-        # Add the tables to the main container
-        # __removed__ container.add('Free now', rooms_table_free_now)
-        # __removed__ container.add('Available from now', rooms_available_from_now)   
-        
-        #add dev info
+            rooms_table_free_now.data.append(''.join(tupleOfData[0][i]), ', '.join(roomsAvailableNow[i]))
+            rooms_table_lecture_ended_now.data.append(''.join(tupleOfData[0][i]), ', '.join(roomsLectureEndedNow[i]))
+            pass
+
+        # Add the tables to the main container, and dev info
         dev_label = toga.Label('dev: Starlightlicious, rev: '+rev, style=Pack(font_size=text_size))
         dev_box.add(dev_label) 
         topLable = toga.Label('Rooms available at the moment:', style=Pack(font_size=text_size))
         data_box.add(topLable)
         data_box.add(rooms_table_free_now)
-        middleLable = toga.Label('Rooms available from now on:', style=Pack(font_size=text_size))
+        middleLable = toga.Label('Rooms in which lessons end now:', style=Pack(font_size=text_size))
         data_box.add(middleLable)
-        data_box.add(rooms_available_from_now)
+        data_box.add(rooms_table_lecture_ended_now)
 
         main_box.add(data_box)
         main_box.add(dev_box)
