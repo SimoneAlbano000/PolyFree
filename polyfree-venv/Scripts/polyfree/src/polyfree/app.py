@@ -2,6 +2,7 @@
 Free rooms in Polito
 """
 import re
+import this
 import requests
 import base64
 from bs4 import BeautifulSoup
@@ -67,10 +68,9 @@ def getRev():
     req = requests.get(rev_url)
     if(req.status_code == requests.codes.ok):
         req = req.json()
-        app_rev = base64.b64decode(req['content'])
+        app_rev = str((base64.b64decode(req['content']))).lstrip("b'").rstrip("'")
     else:
         app_rev = "Not Found"
-    print(app_rev)
     return str(app_rev)
 
 class PolyFree(toga.App):
@@ -82,7 +82,7 @@ class PolyFree(toga.App):
         # Checking revision ----------------------------------------------------
         git_rev = getRev()
         this_rev = '1.0.9'
-        if(str("".join(git_rev.split('.')))!=str("".join(this_rev.split('.')))):
+        if(git_rev != this_rev):
             rev = 'New version available!'
         else:
             rev = this_rev
