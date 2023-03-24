@@ -30,6 +30,7 @@
    ## Now it's time to compile the app into an apk package:
    If you have modified the configuration file (pyproject.toml), you will also need to update the project
    ```bash
+    (polyfree-venv) C:\...\Scripts\polyfree> briefcase create android
     (polyfree-venv) C:\...\Scripts\polyfree> briefcase update android
     (polyfree-venv) C:\...\Scripts\polyfree> briefcase build android
    ```
