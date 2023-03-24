@@ -80,11 +80,10 @@ class PolyFree(toga.App):
         git_rev = getRev()
         this_rev = '1.0.9'
         if(str("".join(git_rev.split('.')))!=str("".join(this_rev.split('.')))):
-            rev = "A new version is available"
+            rev = 'New version available!'
         else:
             rev = this_rev
         # ----------------------------------------------------------------------
-        
         # UI variables
         text_size = 18
 
@@ -107,12 +106,14 @@ class PolyFree(toga.App):
             pass
 
         # Add the tables to the main container, and dev info
-        dev_label = toga.Label('dev: Starlightlicious, rev: '+ rev, style=Pack(font_size=text_size))
+        dev_label = toga.Label('dev: Starlightlicious', style=Pack(font_size=text_size))
+        rev_label = toga.Label('rev: '+ rev, style=Pack(font_size=text_size))
         dev_box.add(dev_label) 
+        dev_box.add(rev_label)
         topLable = toga.Label('Rooms available at the moment:', style=Pack(font_size=text_size))
         data_box.add(topLable)
         data_box.add(rooms_table_free_now)
-        middleLable = toga.Label('Rooms in which lessons end now:', style=Pack(font_size=text_size))
+        middleLable = toga.Label('Rooms in which lesson ends now:', style=Pack(font_size=text_size))
         data_box.add(middleLable)
         data_box.add(rooms_table_lecture_ended_now)
 
