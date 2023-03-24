@@ -61,14 +61,32 @@ def SubtractRooms(dataSet: tuple):
         resRoomList.append(list(set2))
     return resRoomList
 
+def getRev():
+    rev_url = 'https://raw.githubusercontent.com/SimoneAlbano000/PolyFree/main/app.rev'
+    try:
+        page = requests.get(rev_url)
+        app_rev = page.text
+    except:
+        app_rev = "Not Found"
+    return str(app_rev)
+
 class PolyFree(toga.App):
     def startup(self):
         # Create the main container for all the pages
         main_box = toga.Box(style=Pack(direction=COLUMN))
         data_box = toga.Box(style=Pack(direction=COLUMN))
         dev_box = toga.Box(style=Pack(direction=COLUMN))
-        text_size = 10
-        rev = '1.0.9'
+        # Checking revision ----------------------------------------------------
+        git_rev = getRev()
+        this_rev = '1.0.9'
+        if(str("".join(git_rev.split('.')))!=str("".join(this_rev.split('.')))):
+            rev = "A new version is available"
+        else:
+            rev = this_rev
+        # ----------------------------------------------------------------------
+        
+        # UI variables
+        text_size = 18
 
         headings = ['Times:', 'Rooms:']
         data = []
@@ -89,7 +107,7 @@ class PolyFree(toga.App):
             pass
 
         # Add the tables to the main container, and dev info
-        dev_label = toga.Label('dev: Starlightlicious, rev: '+rev, style=Pack(font_size=text_size))
+        dev_label = toga.Label('dev: Starlightlicious, rev: '+ rev, style=Pack(font_size=text_size))
         dev_box.add(dev_label) 
         topLable = toga.Label('Rooms available at the moment:', style=Pack(font_size=text_size))
         data_box.add(topLable)
