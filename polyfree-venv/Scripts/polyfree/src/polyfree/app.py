@@ -2,13 +2,13 @@
 Free rooms in Polito
 """
 import re
-import this
 import requests
 import base64
 from bs4 import BeautifulSoup
 
 import toga
 from toga.style import Pack
+from toga.constants import RED, GREY
 from toga.style.pack import COLUMN, ROW, BOTTOM
 
 def getRooms():
@@ -59,7 +59,7 @@ def SubtractRooms(dataSet: tuple):
             set2.discard(room)
         # Check again for "Empty" sets
         if(len(set2)==0):
-            set2.add(["Empty"])
+            set2.add("Empty")
         resRoomList.append(list(set2))
     return resRoomList
 
@@ -75,20 +75,23 @@ def getRev():
 
 class PolyFree(toga.App):
     def startup(self):
-        # Create the main container for all the pages
-        main_box = toga.Box(style=Pack(direction=COLUMN))
-        data_box = toga.Box(style=Pack(direction=COLUMN))
-        dev_box = toga.Box(style=Pack(direction=COLUMN))
         # Checking revision ----------------------------------------------------
         git_rev = getRev()
         this_rev = '1.0.9'
         if(git_rev != this_rev):
-            rev = 'New version available!'
+            rev = 'New version available! ('+ git_rev + ')'
+            rev_lable_color = RED
         else:
             rev = this_rev
+            rev_lable_color = GREY
         # ----------------------------------------------------------------------
         # UI variables
         text_size = 18
+
+        # Create the main container for all the pages
+        main_box = toga.Box(style=Pack(direction=COLUMN))
+        data_box = toga.Box(style=Pack(direction=COLUMN))
+        dev_box = toga.Box(style=Pack(direction=COLUMN))
 
         headings = ['Times:', 'Rooms:']
         data = []
@@ -110,7 +113,7 @@ class PolyFree(toga.App):
 
         # Add the tables to the main container, and dev info
         dev_label = toga.Label('dev: Starlightlicious', style=Pack(font_size=text_size))
-        rev_label = toga.Label('rev: '+ rev, style=Pack(font_size=text_size))
+        rev_label = toga.Label('rev: ' + rev, style=Pack(font_size=text_size, color=rev_lable_color))
         dev_box.add(dev_label) 
         dev_box.add(rev_label)
         topLable = toga.Label('Rooms available at the moment:', style=Pack(font_size=text_size))
