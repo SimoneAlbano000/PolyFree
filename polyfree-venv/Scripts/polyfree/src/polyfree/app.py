@@ -77,7 +77,7 @@ class PolyFree(toga.App):
     def startup(self):
         # Checking revision ----------------------------------------------------
         git_rev = getRev()
-        this_rev = '1.0.9'
+        this_rev = '1.0.10'
         if(git_rev != this_rev):
             rev = 'New version available! ('+ git_rev + ')'
             rev_lable_color = RED
